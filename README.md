@@ -12,6 +12,10 @@
 
 課程大綱參考 [syllabus.md](syllabus.md)。
 
+課程講義索引參考 [topic_notes_map.md](topic_notes_map.md)。
+
+課程 Demo 程式碼與範例 Notebook 參考 [ai_agent_course_code_github](https://github.com/hychen39/ai_agent_course_code)
+
 建議從環境建置開始，完成 LangChain 基礎後，再進入 LangGraph 工作流程設計。
 
 實作需自行準備模型 API key，並負擔相關費用。
