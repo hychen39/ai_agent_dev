@@ -3,6 +3,8 @@
 
 ## Part I：LangChain Agent 開發
 
+$code_repo$ = https://github.com/hychen39/ai_agent_course_code/tree/main
+
 ### 0: LangChain Agent 開發環境建置與 Python Notebook 使用
 
 [VSCode IDE 開發環境建置與 Python Notebook 使用](setup/setup_vscode.md)
@@ -13,7 +15,7 @@
 - System prompt design 
   - [Prompt Engineering](./prompt_engineering_tool_calling/prompt_eng.md)
   - [補充: Pydantic model 與 Type Hint](./prompt_engineering_tool_calling/pydantic_model.md)
-  - Demo code: code_repo/notebooks/prompt-engineer-tool-calls/prompt_engineering.ipynb
+  - Demo code: $code_repo$/notebooks/prompt-engineer-tool-calls/prompt_engineering.ipynb
 - Tools design and calling  
 - Model Context Protocol (MCP)  
 
