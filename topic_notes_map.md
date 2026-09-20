@@ -10,7 +10,10 @@
 [建立第一個使用 OpenAI API 的 ipynb](setup/first_ipynb_openai_api.md)
 
 ### 1：Prompt Engineering 與工具呼叫設計
-- System prompt design  
+- System prompt design 
+  - [Prompt Engineering](./prompt_engineering_tool_calling/prompt_eng.md)
+  - [補充: Pydantic model 與 Type Hint](./prompt_engineering_tool_calling/pydantic_model.md)
+  - Demo code: code_repo/notebooks/prompt-engineer-tool-calls/prompt_engineering.ipynb
 - Tools design and calling  
 - Model Context Protocol (MCP)  
 
