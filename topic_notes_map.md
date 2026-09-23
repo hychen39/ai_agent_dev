@@ -3,7 +3,7 @@
 
 ## Part I：LangChain Agent 開發
 
-$code_repo$ = https://github.com/hychen39/ai_agent_course_code/tree/main
+\$code_repo = https://github.com/hychen39/ai_agent_course_code/tree/main
 
 ### 0: LangChain Agent 開發環境建置與 Python Notebook 使用
 
@@ -14,8 +14,9 @@ $code_repo$ = https://github.com/hychen39/ai_agent_course_code/tree/main
 ### 1：Prompt Engineering 與工具呼叫設計
 - System prompt design 
   - [Prompt Engineering](./prompt_engineering_tool_calling/prompt_eng.md)
+  - [Prompt Engineering Guided Lab](\$code_repo/labs/prompt_engineering/phone_service_guided_lab.ipynb)
+  - Demo code: \$code_repo/notebooks/prompt-engineer-tool-calls/prompt_engineering.ipynb
   - [補充: Pydantic model 與 Type Hint](./prompt_engineering_tool_calling/pydantic_model.md)
-  - Demo code: $code_repo$/notebooks/prompt-engineer-tool-calls/prompt_engineering.ipynb
 - Tools design and calling  
 - Model Context Protocol (MCP)  
 

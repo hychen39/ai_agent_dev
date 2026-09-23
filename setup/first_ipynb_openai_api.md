@@ -161,7 +161,7 @@ uv add langchain langchain-openai
 ```python
 from langchain.chat_models import init_chat_model
 # Initialize the chat model with the model name
-chat_model = init_chat_model(model_name="gpt-5-nano")
+chat_model = init_chat_model(model="gpt-5-nano")
 ```
 
 新增下一個儲存格，以提示詞字串呼叫聊天模型：
