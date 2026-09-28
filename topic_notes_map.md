@@ -17,6 +17,8 @@
   - Demo code: https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/prompt-engineer-tool-calls/prompt_engineering.ipynb
   - [補充: Pydantic model 與 Type Hint](./prompt_engineering_tool_calling/pydantic_model.md)
 - Tools design and calling  
+  - [Tool Calling](./prompt_engineering_tool_calling/tool_calling.md)
+    - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/prompt-engineer-tool-calls/tool_call.ipynb)
 - Model Context Protocol (MCP)  
 
 ###  2：Memory 與 Agent 行為動態
