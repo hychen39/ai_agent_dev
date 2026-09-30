@@ -621,7 +621,6 @@ response = model.invoke("The courier marked my order as delivered, but I did not
 
 當反覆執行相同任務，但提示詞內容的部份內容會改變時，使用提示詞模板可以減少程式碼重複。
 
-
 例如，先前的的動態少樣本提示應用程式，必須在每次請求時組合任務指令、選出的範例與當前的客戶訊息。
 - 如果每次都手動重新建立完整的訊息列表，程式碼會重複。
 
@@ -634,28 +633,46 @@ response = model.invoke("The courier marked my order as delivered, but I did not
 
 ### 提示詞模板的運作方式
 
-使用字串模板或訊息（訊息物件列表）定義提示詞模板。
+1. 使用**字串**義提示詞模板。
+2. 在字串中將每次請求會改變的部分設為為**預留位置(Placeholder)**。
+   - 預留位置是模板中具有名稱的位置，其值由應用程式稍後提供。
+   - 格式為 `{placeholder_name}`，例如 `{user_input}`。
+3. 渲染模版，將實際值填入預留位置，產生完整的提示詞。
+4. 將完整的提示詞傳給 LLM。
 
-將每次請求會改變的部分保留為**預留位置(Placeholder)**。
-- 預留位置是模板中具有名稱的位置，其值由應用程式稍後提供。
+一個典型的提示詞模板範例：
 
-使用模板物件的 `invoke()` 方法，將實際值填入預留位置，產生完整的提示詞。
+```py
+PROMPT_TEMPLATE_STR = """
+這是一個 few-shot prompt 的模板，包含三個預留位置：
 
-可以在 invoke 之前完成模版的格式化，如:
+任務指令：
+{task_instruction}
+
+選出的範例:
+{selected_examples} 
+
+使用者輸入:
+{user_input}
+"""
+
+Python 的字串提供 `format()`, 可使用 `keyword arguments` 的形式 (placeholder_name=value) 將實際值填入模板。
+
+如下:
 
 ```python
-prompt_template = PROMPT_TEMPLATE.format(
+prompt = PROMPT_TEMPLATE_STR.format(
     task_instruction=task_instruction,
     selected_examples=selected_examples,
     user_input=user_input
 )
-response = llm.invoke(prompt_template)
 ```
 
-這是使用 Python 的字串格式化方法，將實際值填入模板。
+LangChain 提供了 `PromptTemplate` 與 `ChatPromptTemplate` 類別，支援提示詞模板的建立與渲染。
 
+這兩類類別最重要的功能就是實作 `Runnable` 介面，提供 `invoke()` 方法, 以便和其它實作 `Runnable` 介面的物件串接。
 
-第二種方式，在 invoke 時直接傳入一個字典，將實際值與預留位置名稱對應起來, 虛擬碼如下：
+<!-- 第二種方式，在 invoke 時直接傳入一個字典，將實際值與預留位置名稱對應起來, 虛擬碼如下：
 
 ```python
 prompt_template = PromptTemplate(template_structure_with_placeholders)
@@ -665,29 +682,31 @@ prompt = prompt_template.invoke({
     ...
 })
 response = llm.invoke(prompt)
-```
+``` -->
 
-但這種寫法需要使用到 `LangChain` 的 `PromptTemplate` 或 `ChatPromptTemplate` 類別，才能這樣做。
+<!-- 但這種寫法需要使用到 `LangChain` 的 `PromptTemplate` 或 `ChatPromptTemplate` 類別，才能這樣做。 -->
 
 我們以下對 `PromptTemplate` 及 `ChatPromptTemplate` 做進一步的介紹。
 
-### 提示詞模板的類型
+<!-- ### 提示詞模板的類型
 
 - `PromptTemplate` - 以包含預留位置的字串模板，定義可重複使用的提示詞結構。
   - 適用於交談過程中不需要區分 system、user 與 assistant 訊息角色的情況。
 
 - `ChatPromptTemplate` - 以包含預留位置的**訊息物件列表(list of messages)**，定義可重複使用的提示詞結構。
-  - 適用於需要進行多輪對話，並且需要區分 system、user 與 assistant 訊息角色的情況。
+  - 適用於需要進行多輪對話，並且需要區分 system、user 與 assistant 訊息角色的情況。 -->
 
 
 ## PromptTemplate 物件
 
+### 何時使用 PromptTemplate
+
+[`PromptTemplate` 類別](https://reference.langchain.com/python/langchain-core/prompts/prompt/PromptTemplate) 用來建立可重複使用的提示詞結構。
+- 適合不需要區分 system、user 與 assistant 訊息的**單輪提示詞**。
+
 ### 從 f-string 模板建立 PromptTemplate
 
-[`PromptTemplate` 類別](https://reference.langchain.com/python/langchain-core/prompts/prompt/PromptTemplate) 用來建立可重複使用的提示詞結構，使用以包含預留位置的**字串模板(f-string)** 來建立。
-- 適合模型不需要區分 system、user 與 assistant 訊息的單輪提示詞。
-
-當 prompt 的內的比較長時，使用 f-string 撰寫 prompt template 會比較方便。
+當 prompt 的內的比較長時，使用 f-string 撰寫 prompt template 字串會比較方便。
 
 使用 `PromptTemplate.from_template()` 方法，將 f-string 模板轉換為 PromptTemplate 物件。
 
@@ -716,7 +735,9 @@ from langchain_core.prompts import PromptTemplate
 prompt_template = PromptTemplate.from_template(prompt_template_str)
 ```
 
-`PromptTemplate` 提供 `invoke()`， 用來將實際的值填入 placeholder，產生完整的 prompt:
+
+`PromptTemplate` 提供 `invoke()` ， 以 **dict 的形式**將實際值傳入 placeholder，渲染 prompt。
+
 
 ```python
 # Define the runtime values for the placeholders
@@ -731,6 +752,7 @@ Category: Delivery
 """
 
 user_input = "The courier marked my order as delivered, but I did not receive it."
+
 # Assign values to placeholders and render the prompt
 prompt = prompt_template.invoke({
     "task_instruction": task_instruction,
@@ -753,15 +775,16 @@ StringPromptValue(text='\n  Classify each customer message as Billing, Delivery,
 
 ### 何時使用 ChatPromptTemplate
 
-[`ChatPromptTemplate` 類別](https://reference.langchain.com/python/langchain-core/prompts/chat/ChatPromptTemplate) 用來建立可重複使用的提示詞結構，結構以包含預留位置的**訊息物件列表**定義。
+[`ChatPromptTemplate` 類別](https://reference.langchain.com/python/langchain-core/prompts/chat/ChatPromptTemplate) 用來建立可重複使用的提示詞結構。
 
-當提示詞包含多則不同角色（system、user、assistant）的訊息，且需要以不同輸入值重複使用相同結構時，適合使用 `ChatPromptTemplate`。
+當提示詞包含多輸對話，含多則不同角色（system、user、assistant）的訊息，且需要重複使用相同結構時，適合使用 `ChatPromptTemplate`。
+
 
 ### 從訊息物件列表建立 ChatPromptTemplate
 
-當一次要建立多個角色的訊息時，使用 `ChatPromptTemplate.from_messages()` 方法, 將一個包含多個訊息物件的列表轉換為 `ChatPromptTemplate` 物件。
+當一次要建立多個角色的訊息時，使用 [`ChatPromptTemplate.from_messages()`](https://reference.langchain.com/python/langchain-core/prompts/chat/ChatPromptTemplate) 方法, 將一個包含**多個訊息物件的列表**轉換為 `ChatPromptTemplate` 物件。
 
-注意 message list 中的單一 message 的寫法，不是使用 `SystemMessage`、`HumanMessage` 或 `AIMessage` 物件，而是使用 2-tuple of `(message_type, template)`.
+注意 message list 中的單一 message 的寫法，是使用 2-tuple of `(message_type, template)` ，不是使用 `SystemMessage`、`HumanMessage` 或 `AIMessage` 物件。
 
 ### 範例：使用動態少樣本提示進行客戶訊息分類
 
@@ -771,11 +794,11 @@ StringPromptValue(text='\n  Classify each customer message as Billing, Delivery,
 messages_template = [
     ("system", "You classify customer messages as Billing, Delivery, or Product. Return only the category name."),
     ("user", "Relevant examples:\n{selected_examples}"),
+    ("ai", "I understand. Please provide the new customer message for classification."),
     ("user", "New message: {user_input}\nCategory:")
 ]
 ```
 
-注意，使用 tuples 而不是 dict 的方式撰寫單一個 message. 
 
 `ChatPromptTemplate` 會自動將 tuple 轉換為對應的 message object。
 
@@ -787,7 +810,7 @@ from langchain_core.prompts import ChatPromptTemplate
 chat_prompt_template = ChatPromptTemplate.from_messages(messages_template)
 ```
 
-再使用該物件的 `invoke()` 方法，將實際的值填入 placeholder，產生完整的 prompt:
+再使用該物件的 `invoke()` 方法，以 dict 格式將實際的值填入 placeholder，渲染 prompt:
 
 ```python
 # Assign values to placeholders and render the prompt
@@ -796,8 +819,6 @@ prompt = chat_prompt_template.invoke({
     "user_input": user_input
 })
 ```
-
-使用 dict 描述的 placeholder 的名稱與值，以填入 template 中。
 
 查看渲染後的 prompt:
 
@@ -809,7 +830,11 @@ pprint(prompt)
 預期輸出
 
 ```
-ChatPromptValue(messages=[SystemMessage(content='You classify customer messages as Billing, Delivery, or Product. Return only the category name.', additional_kwargs={}, response_metadata={}), HumanMessage(content='Relevant examples:\n\nMessage: My parcel has not arrived yet.\nCategory: Delivery\n\nMessage: The tracking page says my parcel was sent to the wrong city.\nCategory: Delivery\n', additional_kwargs={}, response_metadata={}), HumanMessage(content='New message: The courier marked my order as delivered, but I did not receive it.\nCategory:', additional_kwargs={}, response_metadata={})])
+ChatPromptValue(messages=[
+    SystemMessage(content='You classify customer messages as Billing, Delivery, or Product. Return only the category name.', additional_kwargs={}, response_metadata={}), 
+    HumanMessage(content='Relevant examples:\n\nMessage: My parcel has not arrived yet.\nCategory: Delivery\n\nMessage: The tracking page says my parcel was sent to the wrong city.\nCategory: Delivery\n', additional_kwargs={}, response_metadata={}), 
+    AIMessage(content='I understand. Please provide the new customer message for classification.', additional_kwargs={}, response_metadata={}),
+    HumanMessage(content='New message: The courier marked my order as delivered, but I did not receive it.\nCategory:', additional_kwargs={}, response_metadata={})])
 ```
 
 ### 補充 Q: 可以使用 SystemMessage、HumanMessage 與 AIMessage 物件來建立 ChatPromptTemplate 嗎？
@@ -819,13 +844,14 @@ SystemMessage、HumanMessage 與 AIMessage 皆屬於 `BaseMessage` 的子類別�
 
 如果希望在 `BaseMessage` 中使用 placeholder，需要改用 `BaseMessagePromptTemplate` 的子類別，分別是 `SystemMessagePromptTemplate`、`HumanMessagePromptTemplate` 與 `AIMessagePromptTemplate`。
 
-有興趣的讀者可以參考 LangChain 官方文件. 
+細節請參考 LangChain 官方文件. 
 
 ## 強迫 JSON 格式輸出: 結構化輸出(Structured Output)
 
 ### 為何要強迫 LLM 產生 JSON 格式輸出？
 
-一般的 LLM 回應是自然語言。即使在 prompt 中要求模型回傳 JSON，模型仍可能加入說明文字、遺漏欄位、使用錯誤的資料型態，或產生不合法的 JSON。
+一般的 LLM 回應是自然語言。
+即使在 prompt 中要求模型回傳 JSON，模型仍可能加入說明文字、遺漏欄位、使用錯誤的資料型態，或產生不合法的 JSON。
 
 當模型的輸出需要交給其他程式處理時，應該使用結構化輸出。例如：
 
@@ -834,7 +860,10 @@ SystemMessage、HumanMessage 與 AIMessage 皆屬於 `BaseMessage` 的子類別�
 - 呼叫下一個 API 或 agent。
 - 檢查必要欄位、資料型態及允許值是否正確。
 
-LangChain 的 [`with_structured_output()`](https://docs.langchain.com/oss/python/langchain/models#structured-output) 可以將輸出 schema 綁定到 chat model。模型必須依照 schema 產生結果，LangChain 再將結果解析成對應的 Python object。
+### 如何強迫？
+
+LangChain 的 [`with_structured_output()`](https://docs.langchain.com/oss/python/langchain/models#structured-output) 可以將輸出 schema 綁定到 chat model。
+- 模型必須依照給定的 schema 產生結果，LangChain 再將結果解析成對應的 Python object。
 
 其運作流程為：
 
@@ -844,7 +873,7 @@ LangChain 的 [`with_structured_output()`](https://docs.langchain.com/oss/python
 4. LangChain 將模型輸出解析並驗證為 Pydantic object 或 dict。
 5. 應用程式將輸出 object 轉換成 JSON。
 
-這種方式不是只在 prompt 中加入「Return JSON」指令，而是透過模型供應商支援的 structured-output 或 tool-calling 機制約束輸出。
+這種方式是透過模型供應商支援的 structured-output 或 tool-calling 機制約束輸出(不是在 prompt 中加入 Return JSON 提示詞)
 
 ### 使用 pydantic model 定義輸出格式(schema)
 
@@ -875,13 +904,13 @@ class CustomerMessageClassification(BaseModel):
 - `Field(description=...)` 說明每個欄位的意義，協助模型產生正確內容。
 - 如果輸出缺少必要欄位、欄位型態錯誤，或 `category` 不在允許值中，Pydantic validation 就不會通過。
 
-此 Pydantic model 同時扮演兩個角色：它是提供給模型的輸出 schema，也是應用程式驗證回應的規則。
+此 Pydantic model 同時扮演兩個角色：它是提供給模型的輸出 schema，應用程式也用來驗證(validate) LLM 的回應。
 
 注意： `Field` 的 `description` 參數是提供給模型的提示，要確實描述欄位的意義與限制，LLM 會使用這些描述來分析輸出的內容，並將之轉換成對應的欄位。
 
-### 要求 LLM 產生結構化輸出
+### 使用 Pydantic schema 要求 LLM 產生結構化輸出
 
-先建立一般的 chat model，再呼叫 `with_structured_output()`，指定輸出 schema 為 `CustomerMessageClassification`：
+先建立一般的 chat model，再呼叫 `with_structured_output()`，提供 `CustomerMessageClassification` schema 為參數:
 
 ```python
 from langchain.chat_models import init_chat_model
@@ -916,7 +945,9 @@ messages = [
 response = structured_model.invoke(messages)
 ```
 
-輸出的結果 `response` 是一個 `CustomerMessageClassification` object，已經通過 Pydantic validation。
+輸出的結果 `response` 是一個 `CustomerMessageClassification` object
+- LLM 在回傳時就會執行 Pydantic validation，確保輸出符合 schema。
+- 若驗證不通過，會抛出 Pydantic 的 `ValidationError`
 
 可使用 `response.category` 與 `response.reason` 取得欄位值，或使用 `response.model_dump_json()` 將 Pydantic object 轉換成 JSON string。
 
@@ -960,11 +991,14 @@ print(response.model_dump_json())
 
 本章使用訊息物件或含有 `role`、`content` 的字典組成訊息列表；簡單的獨立請求也可以直接使用文字字串。
 
-### 4. 模板負責組合提示詞，模型負責產生回應
+### 4. 模板負責組合提示詞
 
-`PromptTemplate` 定義文字提示詞結構；`ChatPromptTemplate` 定義含有不同訊息角色的提示詞結構。兩者都透過預留位置重複使用固定結構，並由應用程式填入每次請求的實際資料。
+`PromptTemplate` 定義文字提示詞結構，用於單輪提示詞
 
-記住本章的兩個呼叫階段：**模板的 `invoke()` 填入資料並產生提示詞；模型的 `invoke()` 接收提示詞並產生回應**。動態少樣本提示中的範例選取，也由應用程式完成。
+`ChatPromptTemplate` 定義含有不同訊息角色的提示詞結構，用於多輪對話提示詞。
+
+兩者都透過預留位置重複使用固定結構，並由應用程式填入每次請求的實際資料。
+
 
 ### 5. 用 schema 定義程式需要的輸出
 
@@ -977,4 +1011,3 @@ print(response.model_dump_json())
 - Pydantic 依 schema 驗證結果。成功取得分類物件後，應用程式可讀取 `response.category` 與 `response.reason`。
 - 需要 JSON 字串時，再用 `model_dump_json()` 序列化物件。
 
-將本章概念串起來，處理流程就是：**接收客戶訊息 → 選取相關範例 → 填入模板 → 呼叫模型 → 解析與驗證分類結果 → 供後續程式使用**。
