@@ -21,6 +21,8 @@
     - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/prompt-engineer-tool-calls/tool_call.ipynb)
     - [Guided Lab](https://github.com/hychen39/ai_agent_course_code/tree/main/labs/prompt_engineering/tool_calling_guided_lab.ipynb)
 - Model Context Protocol (MCP)  
+  - [Model Context Protocol (MCP)](./prompt_engineering_tool_calling/mcp_tool_service.md)
+    - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/prompt-engineer-tool-calls/mcp_deepwiki.ipynb)
 
 ###  2：Memory 與 Agent 行為動態
 
