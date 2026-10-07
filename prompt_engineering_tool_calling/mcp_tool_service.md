@@ -29,6 +29,7 @@
 6. 將 tool 註冊給 Agent。
 
 如果多個 AI applications 都要連接相同的外部服務，每個 application 都各自撰寫一套整合程式，便會產生大量重複工作。
+
 當外部 API 改版時，這些整合程式也必須分別維護。
 
 ### The External Tool Integration Problem
@@ -104,7 +105,7 @@ Adapter 會建立可代為呼叫 Server 的 `StructuredTool`，再將這些物�
 ```mermaid
 flowchart TD
     subgraph Local[Local tool 的準備]
-        F[Python function] --> D[使用 @tool 建立 LangChain tool]
+        F[Python function] --> D[使用 @tool 建立 StructuredTool]
     end
     subgraph MCP[MCP tool 的準備]
         C[MCP Client] -->|1. tools/list 請求| S[MCP Server]
@@ -130,7 +131,7 @@ sequenceDiagram
     autonumber
     participant A as LangChain Agent
     participant M as 模型
-    participant T as LangChain tool<br/>由 Adapter 建立
+    participant T as StructuredTool<br/>(由 Adapter 建立)
     participant C as MCP Client
     participant S as MCP Server
     participant E as 外部系統
@@ -192,6 +193,7 @@ Agent 仍然會根據對話內容選擇工具、產生 tool-call request，並�
    - 使用此實例連線至 MCP Server 的 URL。
 2. 查詢 MCP Server 提供的可用工具：
    - 使用 Client 取得 MCP Server 的工具清單。
+   - 自動轉成 `StructuredTool`
 3. 使用取得的工具建立 Agent 實例：
    - 將工具傳入 `create_agent()` 函式，建立可使用這些工具的 Agent。
 4. 使用 `await agent.ainvoke()` 非同步呼叫 Agent。
@@ -206,31 +208,25 @@ LangChain 官方維護 [`langchain-mcp-adapters` 套件](https://reference.langc
 * 工具格式轉換：自動將 MCP Server 上的 Tools 轉化為 `StructuredTool`（如 @tool 或 BaseTool），供大型語言模型（LLM）使用。
 * 多伺服器連接：內建 MultiServerMCPClient，支援同時串接多個獨立的 MCP 伺服器，集中管理異質數據源。
 
-![MCP Adapter](https://raw.githubusercontent.com/langchain-ai/langchain-mcp-adapters/a61c783a7949719a8c3fbe4aeba961f45f3b7849/static/img/mcp.png)
-
 在 uv project 中安裝此套件:
 
 ```bash
 uv add langchain-mcp-adapters
 ```
 
-## MCP Server 
+## MCP Server: DeepWiki 
 
 底下使用 DeepWiki MCP Server 作為範例，說明如何在 LangChain 中使用 MCP 工具。
 
 ### DeepWiki 
 
-DeepWiki 是由 Cognition（開發 AI 軟體工程師 Devin 的公司）推出的 AI 程式碼知識平台。它的目標是將任何公開的 GitHub Repository 自動轉換成一份可以瀏覽、搜尋、對話的 Wiki
+DeepWiki 是由 Cognition AI 公司推出的 AI 程式碼知識平台；
 
-只要輸入 GitHub Repository，例如：`https://github.com/langchain-ai/langchain` DeepWiki 就會分析整個程式碼庫，自動建立：
+目標是將任何公開的 GitHub Repository 自動轉換成一份可以瀏覽、搜尋、對話的 Wiki
 
-* 系統 Overview
-* Architecture
-* Module 說明
-* Class / Function 關係
-* Dependency
-* Mermaid 架構圖
-* 重要 Source Files
+只要輸入 GitHub Repository，例如：`https://github.com/langchain-ai/langchain` ，DeepWiki 就會分析整個程式碼庫，自動將 Repo 轉換成結構完整的維基（Wiki）文檔、架構圖，並提供聊天問答功能，讓開發者能直接對代碼庫提問。
+
+
 
 公開 MCP Server：
 
@@ -246,9 +242,12 @@ DeepWiki 主要提供以下工具：
 
 ### 連線
 
-使用 `langchain_mcp_adapters.client.MultiServerMCPClient` 建立 MCP Client，並連線到 DeepWiki MCP Server. 
+使用 `langchain_mcp_adapters.client.MultiServerMCPClient` 建立 MCP Client
 
-連線時，需要指定使用的 transport layer (e.g., `stdio` for local, `http` for remote) 及 MCP Server URL. 
+連線時，需要：
+
+- 指定使用的 transport layer (e.g., `stdio` for local, `http` for remote) 及 
+- MCP Server URL. 
 
 ```python
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -280,12 +279,9 @@ deep_wiki_client = MultiServerMCPClient(
 
 ### 取得工具清單
 
-程序如下：
+呼叫 `MultiServerMCPClient` 物件的 `get_tools() ` 非同步方法，取得 Server 提供的工具。
 
-1. MCP Client 向 Server 查詢目前可用的工具。
-2. MCP Server 回傳工具的 metadata，包括名稱、說明、輸入參數與輸出格式。
-3. LangChain MCP adapter 將其轉換成 `StructuredTool` 物件，供 Agent 使用。
-- Agent 仍然會根據對話內容選擇工具、產生 tool-call request，並使用工具回傳的結果產生最終回答。
+- 該方法會呼叫 MCP adapter,  回傳`StructuredTool` 物件，供 Agent 使用。
 
 因為查詢工具清單會產生網路請求，所以使用非同步方式操作。
 
@@ -304,7 +300,9 @@ for tool in tools:
     print("-" * 40)
 ```
 
-- `args_schema` 是工具的輸入參數格式，通常是 JSON Schema。
+其中
+
+- `args_schema` 是工具的輸入參數格式模型，通常是 JSON Schema。
 
 例如 `ask_question` 工具的輸入參數格式：
 
@@ -326,7 +324,9 @@ for tool in tools:
 
 ### 設計 System Prompt
 
-在使用 MCP 工具時，需要設計一個適當的 System Prompt，以指導 Agent 如何正確地使用這些工具。
+需要設計一個適當的 System Prompt，以指導 Agent 如何正確地使用 MCP Server 提供的工具。
+
+以下提示詞提示了: 角色、目標 repo、必要行為：
 
 ```py
 system_prompt = """
@@ -349,11 +349,11 @@ Mandatory behavior:
 """
 ```
 
-注意 Prompt 中的 Target repository.
+注意 Prompt 中的 Target repository:
 
-DeepWiki 使用：`owner/repository` 格式指定 GitHub repository，例如：`langchain-ai/langchain`, 所以必須明確告訴 Agent 目標 repository 是哪一個。
+- DeepWiki 使用`owner/repository` 格式指定 GitHub repository，例如：`langchain-ai/langchain`, 所以必須明確告訴 Agent 目標 repository 是哪一個。
 
-這個 `owner/repository` 會傳入 `ask_question` 工具的 `repoName` 參數。
+- 這個 `owner/repository` 會傳入 `ask_question` 工具的 `repoName` 參數。
 
 
 ### Create Agent with the returned MCP tools

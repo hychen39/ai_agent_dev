@@ -28,10 +28,11 @@
 
 - Short-term 
   - [Short-term memory (1)](./memory/memory_1.md)
-    - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/memory.ipynb)
+    - [Demo: Use short-term memory in Agent](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/memory.ipynb)
     - [Guided Lab](https://github.com/hychen39/ai_agent_course_code/tree/main/labs/memory/short_term_memory_guided_lab_student.ipynb)
   - [Short-term memory (2)](./memory/memory_2.md)
-    - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/memory_customize.ipynb)
+    - [Demo: Customized memory schema](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/memory_customize.ipynb)
+    - [CRM Chatbot with Authorization Check](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/crm_chatbot_autho_check.ipynb)
     - [Guided Lab](https://github.com/hychen39/ai_agent_course_code/tree/main/labs/memory/custom_state_guided_lab_student.ipynb)
 - Long-term memory and Dynamic Agents
   - [Long-term memory (1)](./memory/memory_store_1.md)

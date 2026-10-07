@@ -11,7 +11,7 @@
 
 當 Agent 處理更複雜、需要多次與使用者互動的任務時，這項能力對效率與使用者滿意度都十分重要。
 
-記憶能力讓使 Agent 成為**有狀態系統（stateful system）**，能持續保留上下文（context），並隨著互動提供更個人化且切合需求的回應。
+記憶能力使 Agent 成為**有狀態系統（stateful system）**，能持續保留上下文（context），並隨著互動提供更個人化且切合需求的回應。
 
 ### 短期記憶（Short-term Memory）與長期記憶（Long-term Memory）
 
@@ -46,18 +46,16 @@ User: When will it arrive?
 
 假設客戶告訴 Agent ：「以後請用繁體中文回覆。」
 
-如果這項偏好只儲存在**對話緒（thread）**`order-A1024` 中的短期記憶，新的對話緒就無法存取。
+如果這項偏好只儲存在**對話緒（thread）**`order-A1024` 的短期記憶中, 該對話緒就無法存取。
 - 因為短期記憶只在同一個對話緒中有效。
 
 若將它作為長期記憶，儲存在該客戶的身分識別之下， Agent 就能在另一個對話緒中取回並套用這項偏好。
 
-長期記憶通常會持久化至磁碟或資料庫（database），以便跨對話緒取回。
-
-長期記憶要記住的資訊通常是**穩定且不會經常變動**的事實或偏好:
+所以, 長期記憶要記住的資訊通常是**穩定且不會經常變動**的事實或偏好:
 - 應用程式應決定哪些資訊值得記住、如何更新，以及何時取回。
-- 只儲存相關的事實與偏好，有助於避免過時或無關的資訊進入模型的上下文。
+- 只儲存相關的事實與偏好，有助於避免過時或無關的資訊進入模型的上下文。不應儲存所有對話的完整逐字紀錄。
 
-不應儲存所有對話的完整逐字紀錄。
+註: 長期記憶通常會持久化至磁碟或資料庫（database），以便跨對話緒取回。
 
 #### 比較
 
@@ -100,7 +98,7 @@ Agent 會自動維護此訊息歷史，並在每次呼叫大型語言模型（LL
 
 ### 同一交談期(Session)下的多輪對話緒(multi-turn conversation threads)
 
-當使用者連線到 Agent 時，會建立一個交談期(session), 代表使用者與 Agent 之間的連線，有維一的 session_id。
+當使用者連線到 Agent 時，會建立一個交談期(session), 代表使用者與 Agent 之間的連線，有唯一的 session_id。
 
 在同一個交談期下，使用者可以與 Agent 進行多個多輪對話緒(multi-turn conversation threads)，每個對話緒都有一個唯一的識別碼(thread_id)。
 
@@ -161,8 +159,12 @@ Session
 參考資料：
 - [檢查點儲存器：LangChain 文件](https://docs.langchain.com/oss/python/langgraph/checkpointers?_gl=1*em85qg*_gcl_au*MTUxMzgyNzc4Mi4xNzgzNjk3MDYy*_ga*MTE0ODYzNjc0MC4xNzc0NTczMDU3*_ga_47WX3HKKY2*czE3ODU0MjE2MzQkbzMyJGcxJHQxNzg1NDIxNzYwJGo5JGwwJGgw)
 
+
+
 Q: 下個問題，要如何對 Agent 狀態做快照（snapshot）與回復（restore）呢？
 A: LangChain 已幫開發者準備好可直接使用的物件了 -- `InMemorySaver`
+
+
 
 ## `InMemorySaver` 物件
 

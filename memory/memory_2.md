@@ -345,6 +345,7 @@ def update_agent_state(
 - [工具：LangChain 文件](https://docs.langchain.com/oss/javascript/langchain/tools)
 - [ToolRuntime | langgraph.prebuilt](https://reference.langchain.com/python/langgraph.prebuilt/tool_node/ToolRuntime)
   
+
 ![](img/tool_read_update_agent_state_2026-10-04-v2.png)
 
 ## 實務範例：訂單狀態查詢與授權檢查
@@ -366,11 +367,11 @@ def update_agent_state(
 
 工具函數：
 
--`get_order_status()` 只根據`order_id` 查詢訂單狀態。
-  - 在先前的章節中已經實作過。
--`check_order_authorization()` 從自訂狀態（custom state）取得`user_id`，再判斷該使用者
+- `get_order_status()` 只根據`order_id` 查詢訂單狀態。
+
+  - `check_order_authorization()` 從自訂狀態（custom state）取得`user_id`，再判斷該使用者
   是否有權限查看指定的`order_id`。
-  - 此工具回傳檢查結果，並更新 Agent 狀態中的`last_auth_check` 欄位，記錄最後一次授權檢查的時間及檢查的`order_id`。
+- 此工具回傳檢查結果，並更新 Agent 狀態中的`last_auth_check` 欄位，記錄最後一次授權檢查的時間及檢查的`order_id`。
 
 自訂狀態（custom state）:
 - 將`user_id` 放在 Agent 的自訂狀態中，並由檢查點儲存器保存到短期記憶。
@@ -440,7 +441,7 @@ class OrderAgentState(AgentState):
     last_auth_check: LastAuthCheck
 ```
 
-參考資料： [從工具寫入短期記憶：LangChain 短期記憶文件](https://docs.langchain.com/oss/python/langchain/short-term-memory#write-short-term-memory-from-tools)
+參考資料： [Write short-term memory from tools: LangChain Docs](https://docs.langchain.com/oss/python/langchain/short-term-memory#write-short-term-memory-from-tools)
 
 ### `check_order_authorization()` 的工具函式（Tool Function）
 
@@ -557,7 +558,7 @@ Additional authorization rules:
 authorized_system_prompt = system_prompt + "\n" + authorization_rules
 ```
 
-這些規則用來示範 Agent 的工具呼叫順序。
+這些規則用來規範 Agent 的工具呼叫順序。
 
 正式系統仍應在訂單服務的系統邊界強制執行授權，不要只依賴模型遵循提示。
 
