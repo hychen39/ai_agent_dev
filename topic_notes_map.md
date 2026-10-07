@@ -26,8 +26,17 @@
 
 ###  2：Memory 與 Agent 行為動態
 
-- Short-term & Long-term memory  
-- Dynamic Agents  
+- Short-term 
+  - [Short-term memory (1)](./memory/memory_1.md)
+    - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/memory.ipynb)
+    - [Guided Lab](https://github.com/hychen39/ai_agent_course_code/tree/main/labs/memory/short_term_memory_guided_lab_student.ipynb)
+  - [Short-term memory (2)](./memory/memory_2.md)
+    - [Demo](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/memory/memory_customize.ipynb)
+    - [Guided Lab](https://github.com/hychen39/ai_agent_course_code/tree/main/labs/memory/custom_state_guided_lab_student.ipynb)
+- Long-term memory and Dynamic Agents
+  - [Long-term memory (1)](./memory/memory_store_1.md)
+  - [Long-term memory (2)](./memory/memory_store_2.md)
+- 補充: [Python 泛型(Generic)程式設計](./memory/Python_Generics_Introduction.md)
 
 ### 3：Agent 協作與人機互動設計
 - Multi-Agent systems  
