@@ -1,6 +1,14 @@
 
 # Memory Store in LangChain Agents (二)
 
+## 學習目標
+
+完成本章後，學生能：
+
+- 區分短期記憶與跨 thread 的長期記憶。
+- 使用 Tool 寫入與讀取 Memory Store。
+- 整合 Agent、Checkpointer 與 Store，完成跨 thread 存取。
+
 ## 實作 2: 使用 Tool 保存及讀取 ERP 工作備忘錄
 
 ### 應用情境
@@ -25,7 +33,7 @@ Agent 呼叫 Tool，將這筆工作備忘錄寫入 Memory Store。
 Agent 再呼叫 Tool，從 Memory Store 讀取這位使用者保存的 ERP 工作備忘錄，
 並根據 Tool result 整理回覆。
 
-此情境適合使用 Memory Store，因為工作備忘錄是使用者希望跨 thread 保存的
+此情境適合使用長期記憶的 Memory Store，不適合用短期記憶，因為工作備忘錄是使用者希望跨 thread 保存的
 個人資料，不屬於某一個 thread 的 message history。
 
 ### 運作流程
@@ -96,12 +104,11 @@ value = {
 
 ```text
 ("users", "user_123", "follow_ups") / "PO-B2048"
-                    namespace                         key
+                    namespace           key
 ```
 
-將可信任的 `user_id` 放入 namespace，可以隔離不同 ERP 使用者的工作備忘錄。
-相同使用者再次保存相同文件的備忘錄時，`put()` 會更新該 namespace 與 key
-所對應的資料。
+將 `user_id` 放入 namespace，以隔離不同使用者的工作備忘錄。
+
 
 ### 建立自訂 Agent Context
 
@@ -116,12 +123,11 @@ class UserStaticContext:
     user_id: str
 ```
 
-`user_id` 應由 ERP 登入系統或應用程式提供，不應讓 LLM 根據 User message
-自行決定。Tool 可以透過 `runtime.context.user_id` 讀取這個值。
+`user_id` 由 ERP 登入系統或應用程式提供
 
-我們沒有放在 `state_schema` 中
-- 因為 `user_id` 不會隨對話改變，不需要用 Checkpointer 保存。
+Tool 可以透過 `runtime.context.user_id` 讀取這個值。
 
+我們沒有放在短期記憶中，因為 `user_id` 不會隨對話改變，不需要用 Checkpointer 保存。
 ### 建立寫入工作備忘錄的 Tool
 
 `save_erp_follow_up()` 接收 ERP 文件類型、文件編號及備忘錄內容，再使用
@@ -135,7 +141,7 @@ def save_erp_follow_up(
     document_type: str,
     document_id: str,
     note: str,
-    runtime: ToolRuntime[UserStaticContext]
+    runtime: ToolRuntime[UserStaticContext, None]
 ) -> str:
     """
     Save a follow-up note for an ERP document.
@@ -152,7 +158,7 @@ def save_erp_follow_up(
 
     assert runtime.store is not None
 
-    # 從可信任的 Agent Context 取得目前登入者
+    # 從 Static Context 取得目前登入者
     user_id = runtime.context.user_id
 
     # 每一位 User 使用不同的 namespace
@@ -181,9 +187,9 @@ def save_erp_follow_up(
 - `document_id`
 - `note`
 
-Tool 再從可信任的 Context 取得 `user_id`，建立該使用者專屬的 namespace。
+Tool 再從 Context 取得 `user_id`，建立該使用者專屬的 namespace。
 
-`ToolRuntime[ContexT, StateT]` 採用泛型，`ContextT` 是  Context Schema，`StateT` 是 State Schema。
+`ToolRuntime[ContexT, StateT]` 採用泛型，`ContextT` 是  Context Schema，`StateT` 是 State Schema(自訂的短期憶型態)。
 
 這兩個型別決定了以下屬性的回傳型別：
 - `runtime.context` 的型別是 `ContextT`
@@ -198,7 +204,7 @@ Tool 再從可信任的 Context 取得 `user_id`，建立該使用者專屬的 n
 ```python
 @tool
 def get_erp_follow_ups(
-    runtime: ToolRuntime[UserStaticContext]
+    runtime: ToolRuntime[UserStaticContext, None]
 ) -> list[dict]:
     """
     Get the current user's ERP follow-up notes.
@@ -214,7 +220,8 @@ def get_erp_follow_ups(
 
     user_id = runtime.context.user_id
     namespace = ("users", user_id, "follow_ups")
-
+		
+    # SearchItem
     items = runtime.store.search(namespace)
 
     return [
@@ -245,7 +252,7 @@ def get_erp_follow_ups(
 ]
 ```
 
-Agent 會將此回傳值轉換成 `ToolMessage`，再呼叫 LLM 產生適合 User 閱讀的
+StructuredTool  會將此回傳值轉換成 `ToolMessage`，再呼叫 LLM 產生適合 User 閱讀的
 回覆。
 
 ### 建立使用 Memory Store 的 ERP Agent
@@ -319,7 +326,7 @@ save_response = agent.invoke(
 print(save_response["messages"][-1].content)
 ```
 
-LLM 產生的 tool call request 概念如下：
+LLM 產生的 tool call request 如下：
 
 ```python
 {
