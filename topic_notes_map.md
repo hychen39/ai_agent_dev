@@ -44,6 +44,8 @@
 
 ### 3：Agent 協作與人機互動設計
 - Multi-Agent systems  
+  - [Multi-Agent systems](agent_collab/multi_agents.md)
+  - [Case Study](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/multi-agents/case-study.ipynb)
 - Human in the Loop  
 
 ### 4：Agent 觀測與除錯
