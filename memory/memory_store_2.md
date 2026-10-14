@@ -33,8 +33,7 @@ Agent 呼叫 Tool，將這筆工作備忘錄寫入 Memory Store。
 Agent 再呼叫 Tool，從 Memory Store 讀取這位使用者保存的 ERP 工作備忘錄，
 並根據 Tool result 整理回覆。
 
-此情境適合使用長期記憶的 Memory Store，不適合用短期記憶，因為工作備忘錄是使用者希望跨 thread 保存的
-個人資料，不屬於某一個 thread 的 message history。
+此情境適合使用長期記憶的 Memory Store，不適合用短期記憶，因為工作備忘錄是使用者希望跨 thread 保存的個人資料，不屬於某一個 thread 的 message history。
 
 ### 運作流程
 

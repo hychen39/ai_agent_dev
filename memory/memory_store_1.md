@@ -8,11 +8,11 @@
 2. 使用 `namespace`、`key` 與 `value` 組織資料。
 3. 操作 Memory Store，儲存、讀取與查詢資料。
 4. 區分 Static runtime context、Agent State 與 Memory Store 的責任。
-5. 透過 Middleware 產生動態 System Prompt，套用使用者偏好。
+5. 透過 Middleware 函數取得 Memory Store 的值，以產生動態 System Prompt。
 
-## Memory Store
+## Memory Store (記憶庫)
 
-### Why Memory Store
+### 為何需要記憶庫
 
 Short-Term Memory 儲存特定 `thread_id` 的對話歷史.
 
@@ -53,21 +53,20 @@ Agent
 
 LangChain 的 `Memory Store` 抽象化了資料儲存及操作方式，讓開發者可以在不同的儲存後端之間切換，而不需要大幅的修改程式碼。
 
-`Memory Store` 的資料可存入記憶體或資料庫。
-
-同樣，Short-Term Memory 的 Checkpointer 也可以存入記憶體或資料庫。
+`Memory Store` 的資料可存入記憶體或資料庫。(同樣，Short-Term Memory 的 Checkpoint 也可以存入記憶體或資料庫。)
 
 在測試或開發階段，使用記憶體儲存的 Memory Store 與 Checkpointer 可以快速驗證程式邏輯。
 
-在正式部署時，使用資料庫儲存的 Memory Store 與 Checkpointer 可以確保資料的持久性。
+在正式部署時，將其改在到資料庫，確保資料的持久性。
+
 
 ### Memory Store 的資料結構
 
-Memory Store 使用 `namespace` 來切割不同的資料空間
-每個 `namespace` 可以包含多個 `key`
-每個 `key` 對應一個 JSON document，這個 document 可以是任意的 JSON 物件。
+Memory Store 使用 `namespace` 來切割不同的資料空間:
+- 每個 `namespace` 可以包含多個 `key`
+- 每個 `key` 對應一個 JSON document，這個 document 可以是任意的 JSON 物件。
 
-namespace 由一個 tuple 組成，內可有多個元素，用以表示同個 namespace 的不同層級。
+`namespace` 由一個 tuple 組成，內可有多個元素，用以表示同個 namespace 的不同層級。
 - 好像是階層資料夾的概念，方便將不同類型的資料分開管理。
 
 例如，使用 User + Memory Type 方式來切割不同的 namespace：
@@ -92,7 +91,7 @@ user_123
 
 ### Namespace + key 決定唯一的資料位置
 
-LangGraph Store 將每一筆 long-term memory 保存為一份 JSON document，並使用
+Memory Store 將每一筆 long-term memory 保存為一份 JSON document，並使用
 以下三個部分組織資料：
 
 - `namespace`：由字串組成的 tuple，像資料夾路徑，用來劃分資料範圍。
@@ -134,8 +133,7 @@ store = InMemoryStore()
 Note: 此類別位於 `langgraph.store.memory`，不是 `lanchain`. 
 
 
-
-### 將文件放入 namepsace 
+### 將文件放入 namespace 
 
 使用 [`store.put(namespace, key, value)` -> None](https://reference.langchain.com/python/langgraph.store/base/BaseStore/put) 儲存或更新一筆資料。
 - namespace 為 tuple
@@ -193,12 +191,12 @@ store.put(
 
 使用[ `store.search` -> list[SearchItem]](https://reference.langchain.com/python/langgraph.store/base/BaseStore/search) 讀取資料, 該方法回傳該 namespace 下的所有 item, 其型態為 `list[SearchItem]`, 預設回傳 10 筆資料。
 
-[`SearchItem`](https://reference.langchain.com/python/langgraph.store/base/SearchItem) 中:
-- `namespace`: 文件所件的 namespace
-- `key`: 該 namespace 中一筆資料的唯一識別碼，像檔案名稱。
--  `value`: 屬性即是存入的 dictionary 資料。
+[`SearchItem`](https://reference.langchain.com/python/langgraph.store/base/SearchItem) 物作具有以下屬性:
+- `namespace`: 文件所在的 namespace
+- `key`: 該 namespace 中一筆資料的唯一識別碼，類似檔案名稱。
+-  `value`: 存入的 dictionary 資料。
 
-此外，它還提供其他的 metadata, 如 namespace, created_at, updated_at 等。
+此外，它還提供其他的 metadata, 如 created_at, updated_at 等。
 
 例如，讀取 `user_123` 的偏好資料，並逐一印出其 key 與 value:
 
@@ -213,7 +211,6 @@ for item in items:
 Key: communication, Value: {'preferred_language': '台灣繁體中文', 'preferred_answer_style': '精簡、直接'}
 ```
 
-操作 `search` 方法時，使用位置參數傳入 `namespace_prefix`, 即可列出該 namespace prefix 下的所有 items.
 
 
 Ref: https://docs.langchain.com/oss/python/langgraph/stores
@@ -277,7 +274,6 @@ Item(namespace=['users', 'user_123', 'preferences'], key='communication', value=
 請同學自行研究:
 - 語意搜尋 query 
 - 過濾 filter 
-
 
 
 ## 使用 Long-Term Memory 的情境
@@ -348,8 +344,8 @@ Main reference: [Runtime - Docs by LangChain](https://docs.langchain.com/oss/pyt
 
 1. 將登入的 `user_id` 放入 Agent 的 [Static runtime context (靜態執行環境上下文)](https://docs.langchain.com/oss/python/concepts/context) 中(不是放在短期記憶中)。
    - invoke agent 時存入，不是在建立 agent 時存入。
-2. 使用 Middleware, 攔截每次模型呼叫, 讀取 Memory Store 中的使用者偏好, 並回傳動態的 System Prompt
-3. 使用動態的 System Prompt 來呼叫 LLM, 並回覆使用者。
+1. 使用 Middleware, 攔截每次模型呼叫, 讀取 Memory Store 中的使用者偏好, 並回傳動態的 System Prompt
+2. 使用動態的 System Prompt 來呼叫 LLM, 並回覆使用者。
 
 ### 靜態執行環境上下文(Static runtime context)
 
@@ -417,7 +413,8 @@ BASE_SYSTEM_PROMPT = """
 """
 ```
 
-回覆的語言與風格會在 Middleware 中動態地加入到 System Prompt 中。
+目前的 Prompt 沒有指定回覆的語言與風格，
+這些會在 Middleware 中動態地加入到 System Prompt 中。
 
 ### 建立 Middleware function
 
@@ -431,8 +428,9 @@ LangChain 的 Middleware 可攔截 Agent 的執行過程，允許開發者介入
 | `before_model` | 每次模型呼叫前              | 檢查或更新 Agent State、整理訊息     |
 | `after_model`  | 每次模型回應後              | 檢查回應、記錄結果、更新 Agent State |
 | `after_agent`  | 每次 Agent 執行完成後，一次 | 記錄整體結果、最後處理               |
+參考 [補充 2: Middleware 提供的介入時機點](#補充-2-middleware-提供的介入時機點)
 
-底下的 @dynamic_prompt 所修飾的函數，就是掛載下 `before_model`. 
+底下的 `@dynamic_prompt` 所修飾的函數，就是掛載下 `before_model`. 
 
 - 在每次模型呼（Model Call）前觸發 `model_request`，允許開發者取得運行時上下文（Runtime Context），以動態產生或修改系統提示詞（System Prompt）
 
@@ -447,7 +445,6 @@ def user_dynamic_prompt(request: ModelRequest[ContextT]) -> str | SystemMessage:
 ```
 
 其中 `ContextT`為自訂的 Static Runtime Context 的型別(泛型型別參數)。
-
 
 
 這個函數執行的流程如下:
@@ -491,12 +488,12 @@ def user_dynamic_prompt(request: ModelRequest[UserStaticContext]) -> str | Syste
 
     comm_pref = (
         store.get(
-        namespace = ("users", user_id, "preferences"),
-        key = "communication")
+	        namespace = ("users", user_id, "preferences"),
+	        key = "communication")
         if store is not None else None
     )
 
-    # get the preference 
+    # get the preference (Item object)
     preferences = comm_pref.value if comm_pref is not None else {}
 
     # 4. 製作回覆的語言與風格的文字說明
@@ -679,4 +676,3 @@ flowchart TB
 
     AA --> END["回傳結果"]
 ```
-
