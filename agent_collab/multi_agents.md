@@ -440,11 +440,9 @@ Coordination Agent 將有明確邊界的工作委派給三個專業 Subagent，�
 
 完成這份 Notebook 後，應能理解：
 
-1. 如何用不同的 System Prompt 與 Tools 建立專業 Agent。
-2. 如何用 Pydantic Schema 限制專業 Agent 的輸出格式。
-3. 如何將一個 Agent 包裝成另一個 Agent 可以呼叫的 Tool。
-4. 如何由 Coordination Agent 控制子任務的執行順序與資料依賴。
-5. 如何限制主 Agent 與專業 Agent 的責任，避免重複判斷或越權操作。
+1. 如何將一個 Agent 包裝成另一個 Agent 可以呼叫的 Tool。
+2. 如何由 Coordination Agent 控制子任務的執行順序與資料依賴。
+3. 如何限制主 Agent 與專業 Agent 的責任，避免重複判斷或越權操作。
 
 ### 實作架構
 
@@ -610,6 +608,8 @@ def call_procurement_agent(document_id: str) -> dict[str, str]:
 
 
 ### 建立 Coordination Agent
+
+### System Prompt 中描述工作流程及商業規則
 
 在 Coordination Agent 的 System Prompt `COORD_AGENT_SYSTEM_PROMPT` 中特別說明**工作流程及商業規則**, 使主管 Agent 能委派工作:
 
