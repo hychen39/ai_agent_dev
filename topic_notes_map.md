@@ -44,6 +44,7 @@
 - 補充: [Python 泛型(Generic)程式設計](./memory/Python_Generics_Introduction.md)
 
 ### 3：Agent 協作與人機互動設計
+
 - Multi-Agent systems  
   - [Multi-Agent systems](agent_collab/multi_agents.md)
   - [Case Study: 採購單 B2048 送審前檢查](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/multi-agents/case-study.ipynb)
@@ -51,10 +52,25 @@
   - [Human in the Loop (1)](human-in-the-loop/human-loop_1.md)
   - [Human in the Loop (2)](human-in-the-loop/human-loop_2.md)
   - [Demo - inquiry-helper](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/human-in-the-loop/inquiry-helper.ipynb)
+- Agent Chat UI 
+  - [Agent UI：使用 LangSmith Studio 與 Agent Chat UI 測試 Agent](./agent_UI/agent_ui.md)
+  - [Agent UI Guided Lab](./agent_UI/agent-ui-lab.zip)
 
 ### 4：Agent 觀測與除錯
 
-- LangSmith Studio  
+- LangSmith 簡介
+  - [LangSmith 入門](./lang-smith/langsmith_intro.md)
+  - [案例：LangSlice 披薩訂餐 Agent](./lang-smith/case-LangSlice-Agent.md)
+- LangSmith 的追蹤(Tracing) 與除錯(Debugging) 功能
+  - [使用 LangSmith Tracing 觀察 Agent 執行流程 (Tracing)](./lang-smith/tracing.md) 
+  - [使用 LangSmith Trace 與 Studio 除錯 (Debugging)](./lang-smith/debugging.md)
+- 資料集(Datasets)、評估器(Evaluators)與實驗(Experiments)
+  - [Dataset and the off-line evaluation](./lang-smith/test-dataset-offline-evaluation.md)
+    - 補充：人工標註與合成案例](./lang-smith/dataset-annotation-and-synthetic-examples.md)
+    - [使用 Code Evaluator 檢查訂單配料庫存](./lang-smith/ingredient-stock-evaluator.md)
+  - [Code Evaluator](./lang-smith/ingredient-stock-evaluator.md)
+  - [Experiment](./lang-smith/experiment.md)
+   
 
 
 ## Part II：LangGraph Agentic Workflow 設計
