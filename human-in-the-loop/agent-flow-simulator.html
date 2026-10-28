@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent 的訊息旅程｜流程教學模擬</title>
+<style>
+:root{color-scheme:light;--bg:#f4f6fa;--panel:#fff;--ink:#192a40;--muted:#5e6e82;--line:#dbe3ed;--accent:#176d64;--soft:#e8f5f1;--warn:#9b5a12;--warn-bg:#fff5e4;--blue:#305da8;--purple:#7951a4}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Noto Sans TC",sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;padding:8px 14px;background:white;color:var(--ink)}button:hover:not(:disabled){border-color:var(--accent);background:var(--soft)}button:disabled{opacity:.45;cursor:default}.primary{background:var(--accent);border-color:var(--accent);color:white}.primary:hover:not(:disabled){background:#10594f;color:white}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #509bd6;outline-offset:3px}header,main,footer{max-width:1580px;margin:auto;padding:22px 30px}header{padding-bottom:12px}.eyebrow{font-size:13px;letter-spacing:.13em;color:var(--accent);font-weight:750}h1{font-size:30px;line-height:1.3;margin:8px 0}h2{font-size:18px;margin:0}h3{font-size:16px;margin:0 0 12px}p{margin:8px 0}code,pre{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}code{font-size:.88em}pre{font-size:12px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;margin:10px 0 0;padding:12px;border-radius:8px;background:#f2f5f9} .muted{color:var(--muted)}.intro{max-width:1000px;color:var(--muted);margin:8px 0 16px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.toolbar label{font-size:13px;color:var(--muted);margin-left:8px}.toolbar select{border:1px solid var(--line);background:white;border-radius:7px;padding:7px}.tag{border-radius:20px;padding:4px 10px;font-size:12px;font-weight:700;background:var(--soft);color:var(--accent)}.statusbar{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-bottom:18px}.stepno{color:var(--accent);font-size:13px;font-weight:750}.statusbar strong{display:block}.statusbar p{font-size:14px;margin:3px 0 0;color:var(--muted)}.statusbar.wait{border-color:#e3bc7c;background:#fffbf4}.layout{display:grid;grid-template-columns:minmax(285px,.9fr) minmax(350px,1.25fr) minmax(290px,1fr);gap:16px;align-items:start}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}.panel-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line);gap:10px}.panel-body{padding:16px 18px}.small{font-size:13px}.graph{width:100%;display:block;max-height:420px}.node rect{fill:#f7f9fc;stroke:#cbd6e3;stroke-width:1.5;transition:fill .3s,stroke .3s}.node text{fill:var(--ink);font-size:15px;font-family:system-ui,sans-serif;text-anchor:middle}.node .sub{font-size:11px;fill:var(--muted)}.node.active rect{fill:var(--soft);stroke:var(--accent);stroke-width:3}.node.waiting rect{fill:var(--warn-bg);stroke:#c58a35;stroke-width:3}.edge{fill:none;stroke:#cbd6e3;stroke-width:2}.edge.active{stroke:var(--accent);stroke-width:3;stroke-dasharray:8 5;animation:flow 1s linear infinite}.edge.waiting{stroke:#c58a35;stroke-dasharray:5 5}.edge-label{font:11px system-ui;fill:var(--muted)}@keyframes flow{to{stroke-dashoffset:-26}}.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:6px 0 12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--accent)}.dot.wait{background:#c58a35}.tool-name{padding:10px 12px;border-radius:8px;background:#f3f6fa;font-size:13px;overflow-wrap:anywhere}.event-list{list-style:none;padding:0;margin:12px 0 0;max-height:200px;overflow:auto}.event-list li{font-size:12px;color:var(--muted);border-left:2px solid var(--line);padding:5px 10px}.event-list li:last-child{color:var(--accent);border-color:var(--accent);font-weight:650}.message-list{height:640px;overflow:auto;padding:14px;scroll-behavior:smooth}.empty{border:1px dashed var(--line);border-radius:10px;padding:22px;color:var(--muted);text-align:center;font-size:14px}.message{border:1px solid var(--line);border-left:4px solid var(--blue);border-radius:10px;padding:11px 12px;margin-bottom:12px;background:white;transition:box-shadow .15s}.message.ai{border-left-color:var(--purple)}.message.tool{border-left-color:var(--accent)}.message.related{box-shadow:0 0 0 2px #d3a753;background:#fffdf5}.message.selected{box-shadow:0 0 0 2px var(--accent)}.message .top{display:flex;justify-content:space-between;gap:6px;align-items:center;font-size:12px;font-weight:750}.message .kind{color:var(--blue)}.message.ai .kind{color:var(--purple)}.message.tool .kind{color:var(--accent)}.message p{font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;margin:7px 0}.message .callid{font-size:11px;color:var(--muted);overflow-wrap:anywhere}.message summary{cursor:pointer;list-style:none}.message summary::-webkit-details-marker{display:none}.message summary:after{content:'展開訊息欄位 ＋';font-size:11px;color:var(--muted)}.message[open] summary:after{content:'收合訊息欄位 −'}.interaction label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}.interaction input,.interaction textarea{width:100%;padding:9px 10px;border:1px solid #b9c8d8;border-radius:8px;background:white;color:var(--ink)}.interaction textarea{min-height:125px;resize:vertical}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.callout{padding:12px 14px;border-radius:9px;background:var(--soft);font-size:14px;margin-bottom:14px}.callout.wait{background:var(--warn-bg);color:#794d19}.error{color:#ac3535;font-size:13px;min-height:20px;margin:6px 0}.divider{border-top:1px solid var(--line);margin:18px 0}.statebox{display:grid;grid-template-columns:1fr auto;gap:7px;font-size:13px}.statebox dt{color:var(--muted)}.statebox dd{margin:0;font-weight:650;text-align:right}.note{font-size:12px;color:var(--muted)}footer{font-size:12px;color:var(--muted);padding-top:0}footer a{color:var(--accent)}.progress{height:3px;background:#e4eaf2;margin-top:16px;border-radius:3px;overflow:hidden}.progress div{height:100%;background:var(--accent);transition:width .3s}[hidden]{display:none!important}
+@media(min-width:1400px){.message-list{height:690px}}@media(max-width:1100px){.layout{grid-template-columns:minmax(270px,.8fr) minmax(330px,1.2fr)}.interaction-panel{grid-column:1/-1}.interaction-panel>.panel-body{display:grid;grid-template-columns:1fr 1fr;gap:24px}.interaction-panel .divider{display:none}}@media(max-width:720px){header,main,footer{padding:18px 14px}h1{font-size:25px}.layout{grid-template-columns:1fr}.interaction-panel{grid-column:auto;grid-row:2}.interaction-panel>.panel-body{display:block}.interaction-panel .divider{display:block}.statusbar{grid-template-columns:1fr}.statusbar .stepno{display:none}.message-list{height:auto;max-height:600px}.graph{max-height:350px}.toolbar label{margin-left:0}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+ <div class="eyebrow">LANGCHAIN × LANGGRAPH <span class="tag">流程教學模擬</span></div>
+ <h1>Agent 的訊息旅程</h1>
+ <p class="intro">跟著詢價單案例，觀察模型呼叫工具、Middleware 中斷，以及人工回覆如何成為工具結果。所有步驟由固定腳本模擬，不連接 LLM 或郵件服務。</p>
+ <div class="toolbar">
+  <button id="next" class="primary">開始／下一步 →</button><button id="play">自動播放</button><button id="reset">重新開始</button>
+  <label for="speed">播放間隔</label><select id="speed"><option value="2400">2.4 秒</option><option value="4000" selected>4 秒</option><option value="6500">6.5 秒</option></select>
+ </div>
+ <div class="progress" aria-hidden="true"><div id="progress" style="width:0%"></div></div>
+</header>
+<main>
+ <div id="statusbar" class="statusbar" role="status" aria-live="polite"><span id="stepno" class="stepno"></span><div><strong id="stage-title"></strong><p id="stage-desc"></p></div><span id="run-status" class="tag"></span></div>
+ <div class="layout">
+  <section class="panel" aria-labelledby="graph-title">
+   <div class="panel-head"><h2 id="graph-title">01 · 執行流程</h2><span class="muted small">概念示意</span></div>
+   <div class="panel-body">
+    <svg class="graph" viewBox="0 0 360 450" role="img" aria-labelledby="svg-title svg-desc">
+     <title id="svg-title">Agent 模型與工具循環</title><desc id="svg-desc">模型產生工具呼叫，Middleware 檢查後執行工具或等待人工。工具結果回到模型。圖示為教學簡化流程。</desc>
+     <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#8194a9"/></marker></defs>
+     <path id="edge-input" class="edge" d="M180 48 V78" marker-end="url(#arrow)"/>
+     <path id="edge-model" class="edge" d="M180 142 V190" marker-end="url(#arrow)"/>
+     <path id="edge-tools" class="edge" d="M180 254 V309" marker-end="url(#arrow)"/>
+     <path id="edge-return" class="edge" d="M108 341 H24 V110 H102" marker-end="url(#arrow)"/>
+     <path id="edge-human" class="edge" d="M255 222 H282 V393 H245" marker-end="url(#arrow)"/>
+     <path id="edge-resume" class="edge" d="M115 393 H77 V273 H180 V309" marker-end="url(#arrow)"/>
+     <text x="191" y="172" class="edge-label">tool_calls</text><text x="191" y="286" class="edge-label">通過檢查</text><text x="29" y="181" class="edge-label" transform="rotate(-90 29 181)">工具結果回到模型</text><text x="291" y="300" class="edge-label" transform="rotate(90 291 300)">interrupt · 中斷</text>
+     <g id="node-input" class="node"><rect x="113" y="8" width="134" height="40" rx="20"/><text x="180" y="34">使用者輸入</text></g>
+     <g id="node-model" class="node"><rect x="103" y="78" width="154" height="64" rx="12"/><text x="180" y="106">模型 · model</text><text x="180" y="127" class="sub">讀取 messages，產生 AIMessage</text></g>
+     <g id="node-gate" class="node"><rect x="103" y="190" width="154" height="64" rx="12"/><text x="180" y="217">Middleware 檢查</text><text x="180" y="239" class="sub">依工具名稱決定是否中斷</text></g>
+     <g id="node-tools" class="node"><rect x="103" y="309" width="154" height="64" rx="12"/><text x="180" y="337">工具 · tools</text><text x="180" y="359" class="sub">結果寫入 ToolMessage</text></g>
+     <g id="node-human" class="node"><rect x="115" y="379" width="130" height="54" rx="12"/><text x="180" y="402">人工操作</text><text x="180" y="421" class="sub">回覆／核准／編輯／拒絕</text></g>
+    </svg>
+    <div class="legend"><span><i class="dot"></i>目前位置</span><span><i class="dot wait"></i>等待人工</span></div>
+    <div class="tool-name">目前工具：<strong id="current-tool">—</strong></div>
+    <p class="note">Middleware 檢查位置為教學示意。ask_user 以人工回覆作為工具結果，略過工具本體執行。</p>
+    <div class="divider"></div><h3>執行事件</h3><p class="note">中斷與恢復另列於此，不各自新增 message。</p><ol id="events" class="event-list" aria-label="執行事件紀錄"></ol>
+   </div>
+  </section>
+  <section class="panel" aria-labelledby="messages-title">
+   <div class="panel-head"><h2 id="messages-title">02 · messages</h2><span id="message-count" class="tag">0 則</span></div>
+   <div id="messages" class="message-list"><div class="empty">按「開始／下一步」，送出第一則 HumanMessage。</div></div>
+   <div class="panel-body" style="border-top:1px solid var(--line);padding-top:10px;padding-bottom:10px"><p class="note" style="margin:0">點選訊息展開欄位；相同 tool_call_id 的呼叫與回傳會一起標示。</p></div>
+  </section>
+  <section class="panel interaction-panel" aria-labelledby="interaction-title">
+   <div class="panel-head"><h2 id="interaction-title">03 · 人工操作與狀態</h2></div>
+   <div class="panel-body">
+    <div class="interaction">
+     <div id="idle-panel"><div class="callout">先觀察 Agent 如何發現資料缺漏。</div><p class="small muted">播放到 ask_user 時，這裡會出現交貨日期欄位。播放到 send_email 時，這裡會顯示郵件審核表單。</p></div>
+     <form id="date-form" hidden>
+      <div class="callout wait"><strong>中斷 ① · 等待補充資料</strong><p>請提供交貨日期（delivery_date），以完成詢價資料。</p></div>
+      <label for="delivery-date">交貨日期</label><input id="delivery-date" type="date" value="2026-12-31" required>
+      <p class="note">送出後先顯示恢復指令，再於下一步產生 ask_user 的 ToolMessage。</p><div class="actions"><button class="primary" type="submit">送出回覆並恢復</button></div>
+     </form>
+     <form id="review-form" hidden>
+      <div class="callout wait"><strong>中斷 ② · 郵件待審核</strong><p>send_email 已被提出，尚未執行。</p></div>
+      <label for="recipient">收件人</label><input id="recipient" type="email" required>
+      <label for="subject">主旨</label><input id="subject" required>
+      <label for="mail-body">郵件內容</label><textarea id="mail-body" required></textarea>
+      <div class="actions"><button id="approve" type="button" class="primary">核准原稿</button><button id="edit" type="submit">編輯後核准</button></div>
+      <label for="reject-reason">拒絕原因（選填）</label><input id="reject-reason" placeholder="例如：暫不寄出，請結束此次作業。">
+      <div class="actions"><button id="reject" type="button">拒絕寄送</button></div><p id="review-error" class="error" role="alert"></p>
+      <p class="note">「核准原稿」使用模型原先提出的內容；修改欄位後請選「編輯後核准」。</p>
+     </form>
+     <div id="after-panel" hidden><div id="after-text" class="callout"></div><p class="small muted">按「下一步」觀察恢復後的 messages；也可按「自動播放」。</p></div>
+     <div id="done-panel" hidden><div id="done-text" class="callout"></div><button id="restart" type="button">再跑一次，試試其他決策</button></div>
+     <div id="command-box" hidden><label>恢復指令（Python 示意）</label><pre id="command"></pre></div>
+    </div>
+    <div>
+     <div class="divider"></div><h3>當前狀態</h3>
+     <dl class="statebox"><dt>執行狀態</dt><dd id="state-status"></dd><dt>messages 數量</dt><dd id="state-count">0</dd><dt>交貨日期</dt><dd id="state-date">尚未提供</dd><dt>郵件</dt><dd id="state-mail">尚未提出</dd></dl>
+     <p class="note">messages 是依序累積的對話狀態；模型在下一輪讀取先前訊息與工具結果。</p>
+    </div>
+   </div>
+  </section>
+ </div>
+</main>
+<footer>單檔離線教學模擬 · 固定示範單一工具依序呼叫 · Graph 為簡化責任流程圖。參考：<a href="https://docs.langchain.com/oss/python/langchain/human-in-the-loop#decision-types" target="_blank" rel="noopener noreferrer">LangChain 人工決策與恢復流程</a>。</footer>
+<script>
+'use strict';
+// 狀態機只模擬教學流程；無網路請求與真實寄信操作。
+const $ = id => document.getElementById(id);
+const originalInquiry = {supplier:'示範供應商',item:'感測器 A',quantity:100};
+let step=0, messages=[], history=[], selected=-1, playing=false, timer=null;
+let deliveryDate='', decision=null, proposedMail=null, effectiveMail=null, lastCommand=null;
+const stages = [
+ ['準備開始','以缺少交貨日期的詢價資料，觀察一次工具循環。','input','',''],
+ ['使用者送出需求','新增 HumanMessage，提供品項與數量。','input','input',''],
+ ['模型要求驗證資料','新增 AIMessage；tool_calls 指定 validate_inquiry_data 與輸入資料。','model','model','validate_inquiry_data'],
+ ['驗證結果：缺少交貨日期','工具回傳 ToolMessage，指出 missing_fields 包含 delivery_date。','tools','tools','validate_inquiry_data'],
+ ['模型向人工提問','新增 AIMessage，要求呼叫 ask_user；此時只有呼叫，尚無回傳。','model','return','ask_user'],
+ ['中斷 ①：等待人工回覆','Middleware 攔下 ask_user，保留現有 messages，等待人工輸入。','gate','human','ask_user'],
+ ['人工回覆，恢復執行','以 respond 決策恢復；回覆內容將直接成為工具結果。','human','resume','ask_user'],
+ ['回覆寫入 ToolMessage','新增 ask_user 的 ToolMessage；tool_call_id 對應原先的提問呼叫。','tools','resume','ask_user'],
+ ['模型再次要求驗證','模型讀取人工回覆，將交貨日期納入新的驗證參數。','model','return','validate_inquiry_data'],
+ ['驗證結果：資料完整','新增 ToolMessage，is_complete 為 true。','tools','tools','validate_inquiry_data'],
+ ['模型提出寄信呼叫','新增 AIMessage，send_email 參數包含郵件內容；尚未寄出。','model','return','send_email'],
+ ['中斷 ②：等待郵件審核','Middleware 攔下 send_email。請核准原稿、編輯後核准或拒絕。','gate','human','send_email'],
+ ['人工決策，恢復執行','恢復指令攜帶審核決策；下一步呈現工具結果。','human','resume','send_email'],
+ ['郵件決策的工具結果','新增對應 send_email 的 ToolMessage，模型接著讀取結果。','tools','tools','send_email'],
+ ['流程完成','模型讀取工具結果，產生最後一則 AIMessage。','model','return','']
+];
+function call(name,args,id){return {type:'AIMessage',content:'',tool_calls:[{name,args,id,type:'tool_call'}]};}
+function result(name,content,id){return {type:'ToolMessage',content:typeof content==='string'?content:JSON.stringify(content),name,tool_call_id:id};}
+function mailFor(date){return {to:'supplier@example.com',subject:'感測器 A 詢價單',body:`您好：\n想向貴公司詢價以下品項：\n品項：感測器 A\n數量：100 個\n交貨日期：${date}\n請提供單價、交期與報價有效期限，謝謝。`};}
+function addMessageForStep(){
+ switch(step){
+ case 1: messages.push({type:'HumanMessage',content:'請幫我用以下資料寄詢價單給供應商：示範供應商，感測器 A，數量 100 個。'});break;
+ case 2: messages.push(call('validate_inquiry_data',{...originalInquiry},'call_validate_1'));break;
+ case 3: messages.push(result('validate_inquiry_data',{is_complete:false,missing_fields:['delivery_date'],errors:[]},'call_validate_1'));break;
+ case 4: messages.push(call('ask_user',{question:'請提供交貨日期（delivery_date），以完成詢價資料。'},'call_ask_1'));break;
+ case 7: messages.push(result('ask_user',`交貨日期: ${deliveryDate}`,'call_ask_1'));break;
+ case 8: messages.push(call('validate_inquiry_data',{...originalInquiry,delivery_date:deliveryDate},'call_validate_2'));break;
+ case 9: messages.push(result('validate_inquiry_data',{is_complete:true,missing_fields:[],errors:[]},'call_validate_2'));break;
+ case 10: proposedMail=mailFor(deliveryDate);messages.push(call('send_email',{...proposedMail},'call_send_1'));fillReview();break;
+ case 13: messages.push(result('send_email',decision.type==='reject'?`人工拒絕此次寄送：${decision.message}`:{status:'simulated_sent',...effectiveMail},'call_send_1'));break;
+ case 14: messages.push({type:'AIMessage',content:decision.type==='reject'?'已依人工決策取消寄送，本次詢價作業結束。':`模擬寄送完成。收件人：${effectiveMail.to}；交貨日期：${deliveryDate}。`});break;
+ }
+}
+function waiting(){return step===5||step===11;}
+function stop(){playing=false;clearTimeout(timer);timer=null;$('play').textContent='自動播放';}
+function schedule(){clearTimeout(timer);if(playing)timer=setTimeout(()=>{advance();if(playing)schedule();},Number($('speed').value));}
+function advance(){if(waiting()||step>=14)return;step++;addMessageForStep();record();if(waiting()||step===14)stop();render();}
+function record(){history.push({step,text:stages[step][0]});}
+function fillReview(){ $('recipient').value=proposedMail.to;$('subject').value=proposedMail.subject;$('mail-body').value=proposedMail.body; }
+function resume(value){stop();lastCommand=value;step++;record();render();$('next').focus();}
+function chooseReview(kind){
+ if(step!==11)return;
+ if(kind==='edit'){
+  if(!$('review-form').reportValidity())return;
+  effectiveMail={to:$('recipient').value.trim(),subject:$('subject').value.trim(),body:$('mail-body').value.trim()};
+  if(!effectiveMail.subject||!effectiveMail.body){$('review-error').textContent='請填寫主旨與郵件內容。';return;}
+  decision={type:'edit',edited_action:{name:'send_email',args:{...effectiveMail}}};
+ }else if(kind==='approve'){effectiveMail={...proposedMail};decision={type:'approve'};}
+ else {decision={type:'reject',message:$('reject-reason').value.trim()||'暫不寄出，請結束此次作業，不再重試。'};effectiveMail=null;}
+ resume({decisions:[decision]});
+}
+function renderMessages(){
+ const list=$('messages');const previousCount=list.querySelectorAll('.message').length;
+ // 保留未重建的訊息卡片與 details 展開狀態。
+ if(messages.length===0){list.replaceChildren();const empty=document.createElement('div');empty.className='empty';empty.textContent='按「開始／下一步」，送出第一則 HumanMessage。';list.append(empty);}
+ else {
+  list.querySelector('.empty')?.remove();
+  messages.slice(previousCount).forEach((msg,offset)=>{
+   const index=previousCount+offset;const card=document.createElement('details');card.className='message '+(msg.type==='AIMessage'?'ai':msg.type==='ToolMessage'?'tool':'human');card.dataset.index=index;
+   const summary=document.createElement('summary');const top=document.createElement('div');top.className='top';
+   const kind=document.createElement('span');kind.className='kind';kind.textContent=msg.type;const num=document.createElement('span');num.textContent=`#${index+1}`;top.append(kind,num);summary.append(top);
+   const text=document.createElement('p');text.textContent=msg.tool_calls?`呼叫 ${msg.tool_calls[0].name}\n${JSON.stringify(msg.tool_calls[0].args,null,2)}`:msg.content;summary.append(text);
+   const id=msg.tool_call_id||msg.tool_calls?.[0].id;if(id){const label=document.createElement('div');label.className='callid';label.textContent=`${msg.name||msg.tool_calls[0].name} · ${id}`;summary.append(label);}
+   const pre=document.createElement('pre');pre.textContent=JSON.stringify(msg,null,2);card.append(summary,pre);
+   summary.addEventListener('click',()=>{selected=index;highlightMessages();});list.append(card);
+  });
+  if(messages.length>previousCount)list.scrollTop=list.scrollHeight;
+ }
+ highlightMessages();
+}
+function highlightMessages(){const msg=messages[selected];const id=msg?.tool_call_id||msg?.tool_calls?.[0].id;document.querySelectorAll('.message').forEach(card=>{const i=Number(card.dataset.index),m=messages[i];card.classList.toggle('selected',i===selected);card.classList.toggle('related',Boolean(id&&(m.tool_call_id===id||m.tool_calls?.some(c=>c.id===id))&&i!==selected));});}
+function render(){
+ const [title,desc,node,edge,tool]=stages[step];const isWaiting=waiting(),done=step===14;
+ $('stepno').textContent=`${String(step).padStart(2,'0')} / 14`;$('stage-title').textContent=title;$('stage-desc').textContent=desc;
+ $('statusbar').classList.toggle('wait',isWaiting);const status=isWaiting?'等待人工':done?'已完成':step===0?'尚未開始':'可繼續';
+ $('run-status').textContent=status;$('state-status').textContent=status;$('message-count').textContent=messages.length+' 則';$('state-count').textContent=messages.length;
+ $('state-date').textContent=deliveryDate||'尚未提供';$('current-tool').textContent=tool||'—';$('progress').style.width=`${step/14*100}%`;
+ $('state-mail').textContent=step<10?'尚未提出':step<12?'待審核':step<13?'決策已提交':decision?.type==='reject'?'已拒絕，未寄送':'已模擬寄送';
+ $('next').disabled=isWaiting||done;$('play').disabled=isWaiting||done;$('next').textContent=step===0?'開始／下一步 →':'下一步 →';
+ document.querySelectorAll('.node').forEach(el=>{el.classList.toggle('active',el.id===`node-${node}`&&!isWaiting);el.classList.toggle('waiting',isWaiting&&(el.id==='node-gate'||el.id==='node-human'));});
+ document.querySelectorAll('.edge').forEach(el=>{el.classList.toggle('active',el.id===`edge-${edge}`&&!isWaiting);el.classList.toggle('waiting',isWaiting&&el.id==='edge-human');});
+ $('idle-panel').hidden=!(step<5||(step>=7&&step<11));$('date-form').hidden=step!==5;$('review-form').hidden=step!==11;
+ $('after-panel').hidden=!(step===6||step===12||step===13);$('done-panel').hidden=!done;
+ $('after-text').textContent=step===6?`人工回覆已提交：交貨日期 ${deliveryDate}。目前 messages 仍為 ${messages.length} 則。`:step===12?`已提交 ${decision?.type} 決策。目前尚未加入工具結果。`:decision?.type==='reject'?'工具呼叫已被拒絕，拒絕原因成為工具回傳。':'send_email 已完成模擬執行，工具結果已加入 messages。';
+ $('done-text').textContent=decision?.type==='reject'?'已完成拒絕分支。觀察最後的 ToolMessage 與 AIMessage。':'已完成寄送模擬。可重新開始，體驗編輯或拒絕分支。';
+ $('command-box').hidden=!lastCommand||!(step===6||step>=12);
+ if(lastCommand)$('command').textContent=`Command(resume=${JSON.stringify(lastCommand,null,2)})`;
+ const log=$('events');log.replaceChildren();history.forEach(item=>{const li=document.createElement('li');li.textContent=`${String(item.step).padStart(2,'0')} · ${item.text}`;log.append(li);});log.scrollTop=log.scrollHeight;
+ renderMessages();
+}
+function reset(){stop();step=0;messages=[];history=[];selected=-1;deliveryDate='';decision=null;proposedMail=null;effectiveMail=null;lastCommand=null;$('delivery-date').value='2026-12-31';$('reject-reason').value='';$('review-error').textContent='';$('messages').replaceChildren();render();}
+$('next').addEventListener('click',advance);
+$('play').addEventListener('click',()=>{if(playing){stop();return;}if(waiting()||step===14)return;playing=true;$('play').textContent='暫停播放';advance();schedule();});
+$('speed').addEventListener('change',()=>{if(playing)schedule();});
+$('reset').addEventListener('click',reset);$('restart').addEventListener('click',()=>{reset();$('next').focus();});
+$('date-form').addEventListener('submit',event=>{event.preventDefault();if(step!==5||!$('date-form').reportValidity())return;deliveryDate=$('delivery-date').value;resume({decisions:[{type:'respond',message:`交貨日期: ${deliveryDate}`}]});});
+$('approve').addEventListener('click',()=>chooseReview('approve'));
+$('review-form').addEventListener('submit',event=>{event.preventDefault();chooseReview('edit');});
+$('reject').addEventListener('click',()=>chooseReview('reject'));
+render();
+</script>
+</body>
+</html>

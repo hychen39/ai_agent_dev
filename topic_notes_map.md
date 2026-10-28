@@ -51,6 +51,7 @@
 - Human in the Loop  
   - [Human in the Loop (1)](human-in-the-loop/human-loop_1.md)
   - [Human in the Loop (2)](human-in-the-loop/human-loop_2.md)
+    - [追問-中斷-繼續 動態流程展示](human-in-the-loop/agent-flow-simulator.html)
   - [Demo - inquiry-helper](https://github.com/hychen39/ai_agent_course_code/tree/main/notebooks/human-in-the-loop/inquiry-helper.ipynb)
 - Agent Chat UI 
   - [Agent UI：使用 LangSmith Studio 與 Agent Chat UI 測試 Agent](./agent_UI/agent_ui.md)
